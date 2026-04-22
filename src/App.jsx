@@ -111,6 +111,8 @@ function App() {
   const [error, setError] = useState('')
   const [limitInput, setLimitInput] = useState('25')
   const [fineRateInput, setFineRateInput] = useState('10')
+  const [billRateInput, setBillRateInput] = useState('1.5')
+  const [tankCapacityInput, setTankCapacityInput] = useState('500')
   const [acceptedFine, setAcceptedFine] = useState(false)
   const [isSavingLimit, setIsSavingLimit] = useState(false)
   const [isSendingCommand, setIsSendingCommand] = useState(false)
@@ -203,6 +205,28 @@ function App() {
   const exceededBy = Math.max(totalUsageLiters - communityLimitLiters, 0)
   const fineRate = Math.max(toNumber(fineRateInput, 0), 0)
   const fineAmount = exceededBy * fineRate
+  const billRate = Math.max(toNumber(billRateInput, 0), 0)
+  const tankCapacityLiters = Math.max(toNumber(tankCapacityInput, 0), 0)
+  const baseWaterBill = totalUsageLiters * billRate
+  const totalWaterBill = baseWaterBill + (acceptedFine ? fineAmount : 0)
+  const fillTimeMinutes =
+    flowRateLpm > 0 && tankCapacityLiters > 0
+      ? tankCapacityLiters / flowRateLpm
+      : null
+
+  const formatDuration = (minutes) => {
+    if (minutes === null) return 'Enter a valid flow rate and tank capacity.'
+
+    const wholeMinutes = Math.max(minutes, 0)
+    const hours = Math.floor(wholeMinutes / 60)
+    const remainingMinutes = Math.round(wholeMinutes % 60)
+
+    if (hours === 0) {
+      return `${remainingMinutes} min`
+    }
+
+    return `${hours} hr ${remainingMinutes} min`
+  }
 
   const metrics = {
     flowRateLpm,
@@ -218,6 +242,11 @@ function App() {
     exceededBy,
     fineRate,
     fineAmount,
+    billRate,
+    tankCapacityLiters,
+    baseWaterBill,
+    totalWaterBill,
+    fillTimeMinutes,
   }
 
   const onSaveLimit = async () => {
@@ -356,6 +385,64 @@ function App() {
                 Fine payable:{' '}
                 {acceptedFine ? metrics.fineAmount.toFixed(2) : 'Accept terms'}
               </p>
+            </article>
+          </section>
+
+          <section className="card-grid planning-grid">
+            <article className="card">
+              <div className="chart-head">
+                <h2>Water Bill</h2>
+                <p className="muted">Based on current usage</p>
+              </div>
+              <label className="field" htmlFor="billRate">
+                Bill rate per liter
+              </label>
+              <input
+                id="billRate"
+                className="input"
+                value={billRateInput}
+                onChange={(event) => setBillRateInput(event.target.value)}
+                inputMode="decimal"
+              />
+              <div className="bill-summary">
+                <p>
+                  Usage charge: <strong>{metrics.baseWaterBill.toFixed(2)}</strong>
+                </p>
+                <p>
+                  Fine included: <strong>{acceptedFine ? metrics.fineAmount.toFixed(2) : '0.00'}</strong>
+                </p>
+                <p className="bill-total">
+                  Total bill: <strong>{metrics.totalWaterBill.toFixed(2)}</strong>
+                </p>
+              </div>
+            </article>
+
+            <article className="card">
+              <div className="chart-head">
+                <h2>Tank Fill Time</h2>
+                <p className="muted">Estimated from flow rate</p>
+              </div>
+              <label className="field" htmlFor="tankCapacity">
+                Tank capacity in liters
+              </label>
+              <input
+                id="tankCapacity"
+                className="input"
+                value={tankCapacityInput}
+                onChange={(event) => setTankCapacityInput(event.target.value)}
+                inputMode="decimal"
+              />
+              <div className="bill-summary">
+                <p>
+                  Current flow: <strong>{metrics.flowRateLpm.toFixed(2)} L/min</strong>
+                </p>
+                <p>
+                  Fill time: <strong>{formatDuration(metrics.fillTimeMinutes)}</strong>
+                </p>
+                <p className="muted">
+                  Faster flow fills the tank sooner; slower flow takes longer.
+                </p>
+              </div>
             </article>
           </section>
 

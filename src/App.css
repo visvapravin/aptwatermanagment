@@ -41,6 +41,7 @@ h1 {
 
 .top-grid,
 .mid-grid,
+.planning-grid,
 .trend-grid,
 .bottom-grid {
   animation: fade-up 520ms ease both;
@@ -52,6 +53,10 @@ h1 {
 
 .mid-grid {
   animation-delay: 140ms;
+}
+
+.planning-grid {
+  animation-delay: 180ms;
 }
 
 .trend-grid {
@@ -68,6 +73,10 @@ h1 {
 
 .mid-grid {
   grid-template-columns: 1.4fr 1.1fr 1.1fr;
+}
+
+.planning-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .bottom-grid {
@@ -275,6 +284,22 @@ h1 {
   font-size: 0.92rem;
 }
 
+.bill-summary {
+  margin-top: 10px;
+  display: grid;
+  gap: 8px;
+}
+
+.bill-summary p {
+  margin: 0;
+  color: #4c2f1e;
+}
+
+.bill-total {
+  padding-top: 8px;
+  border-top: 1px dashed #e6b48f;
+}
+
 @keyframes fade-up {
   from {
     opacity: 0;
@@ -312,6 +337,7 @@ h1 {
 @media (max-width: 1050px) {
   .top-grid,
   .mid-grid,
+  .planning-grid,
   .bottom-grid,
   .trend-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -319,6 +345,7 @@ h1 {
 
   .top-grid .card,
   .mid-grid .card,
+  .planning-grid .card,
   .trend-grid .card,
   .bottom-grid .card {
     min-height: unset;
@@ -333,6 +360,7 @@ h1 {
 
   .top-grid,
   .mid-grid,
+  .planning-grid,
   .bottom-grid,
   .trend-grid {
     grid-template-columns: 1fr;
